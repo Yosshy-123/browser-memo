@@ -9,11 +9,11 @@ function openDB() {
 			if (!db.objectStoreNames.contains(STORE)) db.createObjectStore(STORE, {
 				keyPath: 'id',
 				autoIncrement: !0
-			})
+			});
 		};
 		r.onsuccess = () => res(r.result);
-		r.onerror = () => rej(r.error)
-	})
+		r.onerror = () => rej(r.error);
+	});
 }
 async function all() {
 	const db = await openDB();
@@ -23,13 +23,13 @@ async function all() {
 		const r = s.getAll();
 		r.onsuccess = () => {
 			res(r.result);
-			db.close()
+			db.close();
 		};
 		r.onerror = () => {
 			rej(r.error);
-			db.close()
-		}
-	})
+			db.close();
+		};
+	});
 }
 async function add(item) {
 	const db = await openDB();
@@ -39,13 +39,13 @@ async function add(item) {
 		const r = s.add(item);
 		r.onsuccess = () => {
 			res(r.result);
-			db.close()
+			db.close();
 		};
 		r.onerror = () => {
 			rej(r.error);
-			db.close()
-		}
-	})
+			db.close();
+		};
+	});
 }
 async function put(item) {
 	const db = await openDB();
@@ -55,13 +55,13 @@ async function put(item) {
 		const r = s.put(item);
 		r.onsuccess = () => {
 			res(r.result);
-			db.close()
+			db.close();
 		};
 		r.onerror = () => {
 			rej(r.error);
-			db.close()
-		}
-	})
+			db.close();
+		};
+	});
 }
 async function del(id) {
 	const db = await openDB();
@@ -71,13 +71,13 @@ async function del(id) {
 		const r = s.delete(Number(id));
 		r.onsuccess = () => {
 			res();
-			db.close()
+			db.close();
 		};
 		r.onerror = () => {
 			rej(r.error);
-			db.close()
-		}
-	})
+			db.close();
+		};
+	});
 }
 const listEl = document.getElementById('list');
 const titleEl = document.getElementById('title');
@@ -93,11 +93,11 @@ let cache = [];
 
 function fmt(d) {
 	if (!d) return '-';
-	return new Date(d).toLocaleString()
+	return new Date(d).toLocaleString();
 }
 
 function esc(s) {
-	return (s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+	return (s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 async function render(q = '') {
 	cache = await all();
@@ -106,7 +106,7 @@ async function render(q = '') {
 	const needle = (q || '').toLowerCase();
 	if (cache.length === 0) {
 		listEl.innerHTML = '<div style="padding:10px;color:#6b7280;">メモがありません</div>';
-		return
+		return;
 	}
 	for (const m of cache) {
 		const text = ((m.title || '') + '\n' + (m.body || '')).toLowerCase();
@@ -115,7 +115,7 @@ async function render(q = '') {
 		div.className = 'item' + (current && current.id === m.id ? ' active' : '');
 		div.innerHTML = `<div style="font-weight:600;">${esc(m.title||'(無題)')}</div><div style="font-size:12px;color:#6b7280;">${fmt(m.updatedAt)}</div>`;
 		div.onclick = () => select(m);
-		listEl.appendChild(div)
+		listEl.appendChild(div);
 	}
 }
 
@@ -123,14 +123,14 @@ function select(m) {
 	current = m;
 	titleEl.value = m.title || '';
 	bodyEl.value = m.body || '';
-	render(searchEl.value)
+	render(searchEl.value);
 }
 
 function clear() {
 	current = null;
 	titleEl.value = '';
 	bodyEl.value = '';
-	render(searchEl.value)
+	render(searchEl.value);
 }
 async function save() {
 	const now = Date.now();
@@ -142,34 +142,34 @@ async function save() {
 	if (current && current.id) {
 		payload.id = current.id;
 		await put(payload);
-		current = payload
+		current = payload;
 	} else {
 		const id = await add(payload);
 		payload.id = id;
-		current = payload
+		current = payload;
 	}
-	await render(searchEl.value)
+	await render(searchEl.value);
 }
 
 function schedule() {
 	if (timer) clearTimeout(timer);
 	timer = setTimeout(() => {
-		save()
-	}, 300)
+		save();
+	}, 300);
 }
 newBtn.onclick = () => {
 	clear();
-	titleEl.focus()
+	titleEl.focus();
 };
 saveBtn.onclick = () => save();
 deleteBtn.onclick = async () => {
 	if (!current || !current.id) {
 		alert('メモが選択されていません');
-		return
+		return;
 	}
 	if (!confirm('削除しますか？')) return;
 	await del(current.id);
-	clear()
+	clear();
 };
 exportBtn.onclick = async () => {
 	const data = await all();
@@ -186,15 +186,15 @@ exportBtn.onclick = async () => {
 	document.body.appendChild(a);
 	a.click();
 	a.remove();
-	URL.revokeObjectURL(url)
-}
+	URL.revokeObjectURL(url);
+};
 titleEl.addEventListener('input', schedule);
 bodyEl.addEventListener('input', schedule);
 searchEl.addEventListener('input', () => render(searchEl.value));
 (async function() {
 	await openDB();
-	await render()
-})()
+	await render();
+})();
 document.getElementById("importBtn").addEventListener("click", () => {
 	const input = document.createElement("input");
 	input.type = "file";
@@ -205,23 +205,23 @@ document.getElementById("importBtn").addEventListener("click", () => {
 		const text = await file.text();
 		let parsed;
 		try {
-			parsed = JSON.parse(text)
+			parsed = JSON.parse(text);
 		} catch (err) {
 			alert("インポートに失敗しました");
-			return
+			return;
 		}
 		let items;
 		if (Array.isArray(parsed)) {
-			items = parsed
+			items = parsed;
 		} else if (parsed && Array.isArray(parsed.memos)) {
-			items = parsed.memos
+			items = parsed.memos;
 		} else {
 			alert("インポートに失敗しました");
-			return
+			return;
 		}
 		if (items.length === 0) {
 			alert("インポートするメモが見つかりませんでした");
-			return
+			return;
 		}
 		try {
 			const db = await openDB();
@@ -231,26 +231,26 @@ document.getElementById("importBtn").addEventListener("click", () => {
 				for (const it of items) {
 					const entry = Object.assign({}, it);
 					if ('id' in entry) delete entry.id;
-					store.put(entry)
+					store.put(entry);
 				}
 				tx.oncomplete = () => {
 					db.close();
-					resolve()
+					resolve();
 				};
 				tx.onerror = () => {
 					db.close();
-					reject(tx.error || new Error("transaction error"))
+					reject(tx.error || new Error("transaction error"));
 				};
 				tx.onabort = () => {
 					db.close();
-					reject(tx.error || new Error("transaction aborted"))
-				}
+					reject(tx.error || new Error("transaction aborted"));
+				};
 			});
 			alert(`${items.length} 件のメモをインポートしました`);
-			await render()
+			await render();
 		} catch (err) {
-			alert("インポート中にエラーが発生しました")
+			alert("インポート中にエラーが発生しました");
 		}
 	};
-	input.click()
-})
+	input.click();
+});
