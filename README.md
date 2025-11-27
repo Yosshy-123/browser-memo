@@ -1,2 +1,2 @@
-# browser-memo
+# Browser Memo
 Browser IndexedDB Memo
