@@ -101,7 +101,7 @@ function esc(s) {
 }
 async function render(q = '') {
 	cache = await all();
-	cache.sort((a, b) => b.updatedAt - (a.updatedAt || 0));
+	cache.sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
 	listEl.innerHTML = '';
 	const needle = (q || '').toLowerCase();
 	if (cache.length === 0) {
@@ -132,7 +132,8 @@ function clear() {
 	bodyEl.value = '';
 	render(searchEl.value);
 }
-async function save() {
+
+async function save(showAlert = false) {
 	const now = Date.now();
 	const payload = {
 		title: titleEl.value.trim(),
@@ -149,6 +150,10 @@ async function save() {
 		current = payload;
 	}
 	await render(searchEl.value);
+
+	if (showAlert) {
+		alert('保存しました');
+	}
 }
 
 function schedule() {
@@ -161,7 +166,7 @@ newBtn.onclick = () => {
 	clear();
 	titleEl.focus();
 };
-saveBtn.onclick = () => save();
+saveBtn.onclick = () => save(true);
 deleteBtn.onclick = async () => {
 	if (!current || !current.id) {
 		alert('メモが選択されていません');
